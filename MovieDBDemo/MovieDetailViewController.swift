@@ -31,7 +31,6 @@ class MovieDetailViewController: UIViewController {
 
             if let imageView = boxArtImageView {
                 if let imageUrl = detail.posterPath {
-                    print("poster: \(dbCoordinator!.imageBaseUrl!)\(dbCoordinator!.imagePosterSize!)\(imageUrl)")
                     
                     if let fullImageUrl = URL(string: "\(dbCoordinator!.imageBaseUrl!)\(dbCoordinator!.imagePosterSize!)\(imageUrl)") {
                         imageView.getImage(from: fullImageUrl)
@@ -41,7 +40,6 @@ class MovieDetailViewController: UIViewController {
             
             if let backgroundView = backgroundImageView {
                 if let imageUrl = detail.backdropPath {
-                    print("backgroujnd: https://image.tmdb.org/t/p/w500\(imageUrl)")
                     
                     if let fullImageUrl = URL(string: "\(dbCoordinator!.imageBaseUrl!)\(dbCoordinator!.imageBackdropSize!)\(imageUrl)") {
                         backgroundView.getImage(from: fullImageUrl)
@@ -82,11 +80,17 @@ class MovieDetailViewController: UIViewController {
 
     var detailItem: Movie? {
         didSet {
-            // Update the view.
             configureView()
         }
     }
-
+    
+    @IBAction func openImdb(sender: UIButton) {
+        guard let detail = detailItem else { return }
+        guard let imdbId = detail.imdbID else { return }
+        guard let fullUrl = URL(string: "https://www.imdb.com/title/\(imdbId)") else { return }
+        
+        UIApplication.shared.open(fullUrl)
+    }
 
 }
 

@@ -25,11 +25,14 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        navigationItem.leftBarButtonItem = editButtonItem
-
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
-        navigationItem.rightBarButtonItem = addButton
+        
+        navigationController?.isToolbarHidden = false
+        navigationController?.hidesBottomBarWhenPushed = false
+        
+        let searchField = UISearchBar(frame: .zero)
+        searchField.placeholder = "Search movies"
+        navigationItem.titleView = searchField
+        
         if let split = splitViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? MovieDetailViewController
@@ -40,6 +43,9 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
     
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
+        
+        navigationController?.isToolbarHidden = false
+        
         super.viewWillAppear(animated)
     }
     
@@ -127,7 +133,14 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
 
     func configureCell(_ cell: MovieListTableViewCell, withEvent event: Movie) {
         cell.titleLabel!.text = event.title ?? event.originalTitle ?? "No title"
-        cell.subtitleLabel!.text = event.tagline ?? event.releaseDate?.description ?? event.overview ?? ""
+        var convertedReleaseDate:String? = nil
+        if event.tagline == nil, let date = event.releaseDate {
+            let df = DateFormatter()
+            df.dateStyle = .medium
+            df.timeStyle = .none
+            convertedReleaseDate = "Released \(df.string(from: date))"
+        }
+        cell.subtitleLabel!.text = event.tagline ?? convertedReleaseDate ?? event.overview ?? ""
         
         if let imageView = cell.posterImageView {
             if let imageUrl = event.posterPath {

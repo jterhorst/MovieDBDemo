@@ -75,6 +75,8 @@ class MovieDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationController?.isToolbarHidden = true
+        
         configureView()
     }
 

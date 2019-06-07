@@ -145,6 +145,9 @@ class MovieDBCoordinator: NSObject {
                 }
             }
             try? context.save()
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+            }
         })
     }
     
@@ -169,6 +172,9 @@ class MovieDBCoordinator: NSObject {
                 }
             }
             try? context.save()
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+            }
         })
     }
     
@@ -194,6 +200,9 @@ class MovieDBCoordinator: NSObject {
                 }
             }
             try? context.save()
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+            }
         })
     }
     

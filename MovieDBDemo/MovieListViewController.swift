@@ -17,11 +17,14 @@ class MovieListTableViewCell : UITableViewCell {
     
 }
 
-class MovieListViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class MovieListViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchBarDelegate {
 
     var detailViewController: MovieDetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
     var dbCoordinator: MovieDBCoordinator? = nil
+    
+    let searchField = UISearchBar(frame: .zero)
+    let listTypeSegmentedControl = UISegmentedControl(items: ["Featured","Top","Now Playing"])
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,22 +32,24 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         navigationController?.isToolbarHidden = false
         navigationController?.hidesBottomBarWhenPushed = false
         
-        let searchField = UISearchBar(frame: .zero)
         searchField.placeholder = "Search movies"
+        searchField.delegate = self
         navigationItem.titleView = searchField
+        
+        setToolbarItems([UIBarButtonItem(customView: listTypeSegmentedControl)], animated: false)
+        listTypeSegmentedControl.selectedSegmentIndex = 0
+        listTypeSegmentedControl.addTarget(self, action: #selector(updateForSegmentedControlChange), for: .valueChanged)
         
         if let split = splitViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? MovieDetailViewController
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadImages), name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadContents), name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
-        
-        navigationController?.isToolbarHidden = false
         
         super.viewWillAppear(animated)
     }
@@ -54,32 +59,24 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         super.viewDidAppear(animated)
     }
 
-    @objc func reloadImages() {
+    @objc func reloadContents() {
         tableView.reloadData()
     }
     
-    @objc
-    func insertNewObject(_ sender: Any) {
-        let context = self.fetchedResultsController.managedObjectContext
-        let newEvent = Movie(context: context)
-             
-        // If appropriate, configure the new managed object.
-        newEvent.releaseDate = Date()
-
-        // Save the context.
-        do {
-            try context.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
+    @objc func updateForSegmentedControlChange(sender: UISegmentedControl) {
+        _fetchedResultsController = nil
+        tableView.reloadData()
     }
-
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        _fetchedResultsController = nil
+        tableView.reloadData()
+    }
+    
     // MARK: - Segues
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        searchField.resignFirstResponder()
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
             let object = fetchedResultsController.object(at: indexPath)
@@ -90,6 +87,16 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         }
+    }
+    
+    // MARK: - scrolling behavior
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        searchField.resignFirstResponder()
+    }
+    
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchField.resignFirstResponder()
     }
 
     // MARK: - Table View

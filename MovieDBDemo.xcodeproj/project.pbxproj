@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0ADCBDFB22A9D372006A02C2 /* JTCachingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADCBDFA22A9D372006A02C2 /* JTCachingImageView.swift */; };
 		5838A95322A45CB1002DC97B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5838A95222A45CB1002DC97B /* AppDelegate.swift */; };
 		5838A95622A45CB1002DC97B /* MovieDBDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5838A95422A45CB1002DC97B /* MovieDBDemo.xcdatamodeld */; };
 		5838A95822A45CB1002DC97B /* MovieListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5838A95722A45CB1002DC97B /* MovieListViewController.swift */; };
@@ -40,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0ADCBDFA22A9D372006A02C2 /* JTCachingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JTCachingImageView.swift; sourceTree = "<group>"; };
 		5838A94F22A45CB1002DC97B /* Movies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5838A95222A45CB1002DC97B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5838A95522A45CB1002DC97B /* MovieDBDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MovieDBDemo.xcdatamodel; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 		5838A95122A45CB1002DC97B /* MovieDBDemo */ = {
 			isa = PBXGroup;
 			children = (
+				0ADCBDFA22A9D372006A02C2 /* JTCachingImageView.swift */,
 				5838A98722A474E8002DC97B /* Movie+CoreDataClass.swift */,
 				5838A98822A474E8002DC97B /* Movie+CoreDataProperties.swift */,
 				5838A95222A45CB1002DC97B /* AppDelegate.swift */,
@@ -279,6 +282,7 @@
 				5838A98622A4673C002DC97B /* MovieDBCoordinator.swift in Sources */,
 				5838A95622A45CB1002DC97B /* MovieDBDemo.xcdatamodeld in Sources */,
 				5838A95822A45CB1002DC97B /* MovieListViewController.swift in Sources */,
+				0ADCBDFB22A9D372006A02C2 /* JTCachingImageView.swift in Sources */,
 				5838A98922A474E8002DC97B /* Movie+CoreDataClass.swift in Sources */,
 				5838A98A22A474E8002DC97B /* Movie+CoreDataProperties.swift in Sources */,
 				5838A95A22A45CB1002DC97B /* MovieDetailViewController.swift in Sources */,
@@ -459,6 +463,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 88G66A5273;
 				INFOPLIST_FILE = MovieDBDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -477,6 +482,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 88G66A5273;
 				INFOPLIST_FILE = MovieDBDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

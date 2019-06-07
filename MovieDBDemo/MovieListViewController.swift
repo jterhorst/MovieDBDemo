@@ -9,6 +9,14 @@
 import UIKit
 import CoreData
 
+class MovieListTableViewCell : UITableViewCell {
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subtitleLabel: UILabel!
+    @IBOutlet weak var posterImageView: JTCachingImageView!
+    
+}
+
 class MovieListViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     var detailViewController: MovieDetailViewController? = nil
@@ -26,12 +34,11 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? MovieDetailViewController
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadImages), name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
-        
-        
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
     }
@@ -41,6 +48,10 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         super.viewDidAppear(animated)
     }
 
+    @objc func reloadImages() {
+        tableView.reloadData()
+    }
+    
     @objc
     func insertNewObject(_ sender: Any) {
         let context = self.fetchedResultsController.managedObjectContext
@@ -87,10 +98,10 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? MovieListTableViewCell
         let event = fetchedResultsController.object(at: indexPath)
-        configureCell(cell, withEvent: event)
-        return cell
+        configureCell(cell!, withEvent: event)
+        return cell!
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -114,8 +125,20 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         }
     }
 
-    func configureCell(_ cell: UITableViewCell, withEvent event: Movie) {
-        cell.textLabel!.text = event.releaseDate!.description
+    func configureCell(_ cell: MovieListTableViewCell, withEvent event: Movie) {
+        cell.titleLabel!.text = event.title ?? event.originalTitle ?? "No title"
+        cell.subtitleLabel!.text = event.tagline ?? event.releaseDate?.description ?? event.overview ?? ""
+        
+        if let imageView = cell.posterImageView {
+            if let imageUrl = event.posterPath {
+                if let baseurl = dbCoordinator!.imageBaseUrl, let posterSize = dbCoordinator!.imagePosterSize {
+                    if let fullImageUrl = URL(string: "\(baseurl)\(posterSize)\(imageUrl)") {
+                        imageView.getImage(from: fullImageUrl)
+                    }
+                }
+                
+            }
+        }
     }
 
     // MARK: - Fetched results controller
@@ -176,9 +199,9 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
             case .delete:
                 tableView.deleteRows(at: [indexPath!], with: .fade)
             case .update:
-                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Movie)
+                configureCell(tableView.cellForRow(at: indexPath!) as! MovieListTableViewCell, withEvent: anObject as! Movie)
             case .move:
-                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Movie)
+                configureCell(tableView.cellForRow(at: indexPath!) as! MovieListTableViewCell, withEvent: anObject as! Movie)
                 tableView.moveRow(at: indexPath!, to: newIndexPath!)
         }
     }

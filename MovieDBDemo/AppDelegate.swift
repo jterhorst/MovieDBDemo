@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
         dbCoordinator = MovieDBCoordinator()
         dbCoordinator?.persistentContainer = self.persistentContainer
+        dbCoordinator?.loadImageConfiguration()
         
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
         let controller = masterNavigationController.topViewController as! MovieListViewController

@@ -60,13 +60,20 @@ public class Movie: NSManagedObject {
         
         if let dateString = payload["release_date"] {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateStyle = .short
-            dateFormatter.timeStyle = .none
+            dateFormatter.dateFormat = "yyyy-MM-dd"
             self.releaseDate = dateFormatter.date(from: dateString as! String)
         }
         
         if let revenue = payload["revenue"] {
             self.revenue = revenue as! Int64
+        }
+        
+        if let voteAvg = payload["vote_average"] {
+            self.voteAverage = voteAvg as! Double
+        }
+        
+        if let voteCount = payload["vote_count"] {
+            self.voteCount = voteCount as! Int64
         }
         
     }

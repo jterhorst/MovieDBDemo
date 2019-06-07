@@ -46,6 +46,10 @@ public class Movie: NSManagedObject {
             self.originalTitle = title as? String
         }
         
+        if let title = payload["title"] {
+            self.title = title as? String
+        }
+        
         if let overview = payload["overview"] {
             self.overview = overview as? String
         }
@@ -60,6 +64,7 @@ public class Movie: NSManagedObject {
         
         if let dateString = payload["release_date"] {
             let dateFormatter = DateFormatter()
+            dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
             dateFormatter.dateFormat = "yyyy-MM-dd"
             self.releaseDate = dateFormatter.date(from: dateString as! String)
         }
@@ -74,6 +79,10 @@ public class Movie: NSManagedObject {
         
         if let voteCount = payload["vote_count"] {
             self.voteCount = voteCount as! Int64
+        }
+        
+        if let video = payload["video"] {
+            self.video = video as! Bool
         }
         
     }

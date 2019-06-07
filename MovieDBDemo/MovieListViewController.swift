@@ -24,7 +24,7 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
     var dbCoordinator: MovieDBCoordinator? = nil
     
     let searchField = UISearchBar(frame: .zero)
-    let listTypeSegmentedControl = UISegmentedControl(items: ["Featured","Top","Now Playing"])
+    let listTypeSegmentedControl = UISegmentedControl(items: ["Now Playing","Popular","Top Rated"])
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,21 +54,35 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         super.viewWillAppear(animated)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        dbCoordinator?.nowPlayingMovies()
-        super.viewDidAppear(animated)
-    }
-
     @objc func reloadContents() {
         tableView.reloadData()
     }
     
     @objc func updateForSegmentedControlChange(sender: UISegmentedControl) {
+        switch sender.selectedSegmentIndex {
+        case 0:
+            dbCoordinator?.nowPlayingMovies()
+            break
+        case 1:
+            dbCoordinator?.popularMovies()
+            break
+        case 2:
+            dbCoordinator?.topRatedMovies()
+            break
+        default:
+            dbCoordinator?.nowPlayingMovies()
+            break
+        }
+        
         _fetchedResultsController = nil
         tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count > 0 {
+            dbCoordinator?.movieResults(matching: searchText)
+        }
+        
         _fetchedResultsController = nil
         tableView.reloadData()
     }
@@ -173,10 +187,47 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         // Set the batch size to a suitable number.
         fetchRequest.fetchBatchSize = 20
         
-        // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "releaseDate", ascending: false)
-        
-        fetchRequest.sortDescriptors = [sortDescriptor]
+        if let searchText = searchField.text, searchText.count > 0 {
+            let filterPredicate = NSPredicate(format: "%K CONTAINS[cd] %@ OR %K CONTAINS[cd] %@", argumentArray: ["title",searchText,"originalTitle",searchText])
+            fetchRequest.predicate = filterPredicate
+            let sortDescriptor = NSSortDescriptor(key: "resultSortIndex", ascending: true)
+            fetchRequest.sortDescriptors = [sortDescriptor]
+        } else {
+            switch listTypeSegmentedControl.selectedSegmentIndex {
+            case 0: // now playing
+                do {
+                    let startDate = Date().addingTimeInterval(-2592000)
+                    let endDate = Date()
+                    let filterPredicate = NSPredicate(format: "%K >= %@ && %K <= %@", argumentArray: ["releaseDate",startDate,"releaseDate",endDate])
+                    fetchRequest.predicate = filterPredicate
+                    let sortDescriptor = NSSortDescriptor(key: "releaseDate", ascending: false)
+                    fetchRequest.sortDescriptors = [sortDescriptor]
+                }
+            case 1: // popular
+                do {
+                    let startDate = Date().addingTimeInterval(-2592000)
+                    let endDate = Date()
+                    let filterPredicate = NSPredicate(format: "%K >= %@ && %K <= %@", argumentArray: ["releaseDate",startDate,"releaseDate",endDate])
+                    fetchRequest.predicate = filterPredicate
+                    let sortDescriptor = NSSortDescriptor(key: "popularity", ascending: false)
+                    fetchRequest.sortDescriptors = [sortDescriptor]
+                }
+            case 2: // top rated
+                do {
+                    let startDate = Date().addingTimeInterval(-2592000)
+                    let endDate = Date()
+                    let filterPredicate = NSPredicate(format: "%K >= %@ && %K <= %@", argumentArray: ["releaseDate",startDate,"releaseDate",endDate])
+                    fetchRequest.predicate = filterPredicate
+                    let sortDescriptor = NSSortDescriptor(key: "voteAverage", ascending: false)
+                    fetchRequest.sortDescriptors = [sortDescriptor]
+                }
+            default:
+                do {
+                    let sortDescriptor = NSSortDescriptor(key: "releaseDate", ascending: false)
+                    fetchRequest.sortDescriptors = [sortDescriptor]
+                }
+            }
+        }
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".

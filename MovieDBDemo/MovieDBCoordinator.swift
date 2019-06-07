@@ -206,7 +206,7 @@ class MovieDBCoordinator: NSObject {
         })
     }
     
-    public func movieResults(matching search:String, completion: @escaping (_ result: [Movie]) -> Void) {
+    public func movieResults(matching search:String, completion: ((_ result: [Movie]) -> Void)? = nil) {
         var apiKey = ""
         var plistDict: NSDictionary?
         if let path = Bundle.main.path(forResource: "APIKeys", ofType:"plist") {
@@ -216,14 +216,16 @@ class MovieDBCoordinator: NSObject {
         
         if let encodedSearchQuery = search.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
             let apiPath = "/search/movie?query=\(encodedSearchQuery)&api_key=\(apiKey)&include_adult=false"
-            print("path: \(apiPath)")
             persistentContainer?.performBackgroundTask({ context in
                 var backgroundMovies: [Movie] = []
                 
                 if let data = self.loadArray(resourcePath: apiPath) {
+                    var newIndex:Int64 = 0
                     for item in data {
-                        print("parsing \(item)")
-                        backgroundMovies.append(self.movieFromJSON(payload: item, context: context))
+                        let payloadMovie = self.movieFromJSON(payload: item, context: context)
+                        payloadMovie.resultSortIndex = newIndex // inject an index value matching the order it appears in JSON to allow CoreData to sort this in the other thread
+                        backgroundMovies.append(payloadMovie)
+                        newIndex = newIndex + 1
                     }
                 }
                 try? context.save()
@@ -243,38 +245,18 @@ class MovieDBCoordinator: NSObject {
                         }
                     }
                     
-                    completion(movies)
+                    if let compl = completion {
+                        compl(movies)
+                    }
+                    
                 }
             })
         } else {
-            completion([]);
+            if let compl = completion {
+                compl([])
+            }
         }
         
     }
-    
-    
-//    public func getImage(from url: URL, completion: @escaping (_ image: UIImage?) -> ()) {
-//        if let imageFromCache = imageCache.object(forKey: url.absoluteString as AnyObject) {
-//            completion(imageFromCache)
-//            return
-//        }
-//
-//        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-//            guard let data = data, error == nil else {
-//                DispatchQueue.main.async {
-//                    completion(nil)
-//                }
-//                return;
-//            }
-//
-//            DispatchQueue.main.async {
-//                if let image = UIImage(data: data) {
-//                    imageCache.setObject(image, forKey: url.absoluteString as AnyObject)
-//                    completion(image)
-//                }
-//
-//            }
-//        }).resume()
-//    }
     
 }

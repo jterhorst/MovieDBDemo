@@ -19,6 +19,7 @@ extension Movie {
 
     @NSManaged public var cloudID: Int64
     @NSManaged public var voteCount: Int64
+    @NSManaged public var resultSortIndex: Int64
     @NSManaged public var video: Bool
     @NSManaged public var voteAverage: Double
     @NSManaged public var title: String?

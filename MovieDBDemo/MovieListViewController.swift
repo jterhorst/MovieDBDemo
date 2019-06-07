@@ -34,6 +34,7 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         
         searchField.placeholder = "Search movies"
         searchField.delegate = self
+        searchField.tintColor = .black
         navigationItem.titleView = searchField
         
         setToolbarItems([UIBarButtonItem(customView: listTypeSegmentedControl)], animated: false)

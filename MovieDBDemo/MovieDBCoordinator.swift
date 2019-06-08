@@ -266,6 +266,8 @@ class MovieDBCoordinator: NSObject {
                         }
                     }
                     
+                    NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+                    
                     if let compl = completion {
                         compl(movies)
                     }
@@ -273,8 +275,12 @@ class MovieDBCoordinator: NSObject {
                 }
             })
         } else {
-            if let compl = completion {
-                compl([])
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+                
+                if let compl = completion {
+                    compl([])
+                }
             }
         }
         

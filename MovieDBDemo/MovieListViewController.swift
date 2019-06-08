@@ -30,7 +30,6 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         super.viewDidLoad()
         
         navigationController?.isToolbarHidden = false
-        navigationController?.hidesBottomBarWhenPushed = false
         
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
@@ -51,10 +50,14 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadContents), name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
+        
+        _refreshData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
+        
+        navigationController?.setToolbarHidden(false, animated: true)
         
         super.viewWillAppear(animated)
     }
@@ -64,6 +67,7 @@ class MovieListViewController: UITableViewController, NSFetchedResultsController
     }
     
     @objc func reloadContents() {
+        _fetchedResultsController = nil
         tableView.reloadData()
         refreshControl?.endRefreshing()
     }

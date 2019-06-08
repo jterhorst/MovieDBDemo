@@ -18,8 +18,6 @@ class MovieDBCoordinator: NSObject {
     var managedObjectContext: NSManagedObjectContext? = nil
     var persistentContainer: NSPersistentContainer? = nil
     
-    
-    
     var imageBaseUrl: String? = nil
     var imageBackdropSize: String? = nil
     var imagePosterSize: String? = nil
@@ -146,6 +144,7 @@ class MovieDBCoordinator: NSObject {
             }
             try? context.save()
             DispatchQueue.main.async {
+                try? self.managedObjectContext?.save()
                 NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
             }
         })
@@ -173,6 +172,7 @@ class MovieDBCoordinator: NSObject {
             }
             try? context.save()
             DispatchQueue.main.async {
+                try? self.managedObjectContext?.save()
                 NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
             }
         })
@@ -201,9 +201,30 @@ class MovieDBCoordinator: NSObject {
             }
             try? context.save()
             DispatchQueue.main.async {
+                try? self.managedObjectContext?.save()
                 NotificationCenter.default.post(name: MovieDBCoordinator.MovieDBCoordinatorConfigUpdated, object: nil)
             }
         })
+    }
+    
+    public func loadDetailsForMovie(movie: Movie, completion: ((_ result: [String: Any]) -> Void)? = nil) {
+        var apiKey = ""
+        var plistDict: NSDictionary?
+        if let path = Bundle.main.path(forResource: "APIKeys", ofType:"plist") {
+            plistDict = NSDictionary(contentsOfFile: path)
+            apiKey = plistDict!["V3_API_KEY"] as! String
+        }
+        
+        let apiPath = "/movie/\(movie.cloudID)?api_key=\(apiKey)"
+        DispatchQueue.global(qos: .background).async {
+            if let data = self.loadDict(resourcePath: apiPath) {
+                DispatchQueue.main.async {
+                    if let compl = completion {
+                        compl(data)
+                    }
+                }
+            }
+        }
     }
     
     public func movieResults(matching search:String, completion: ((_ result: [Movie]) -> Void)? = nil) {

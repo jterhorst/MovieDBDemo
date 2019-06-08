@@ -61,7 +61,11 @@ class MovieDetailViewController: UIViewController {
                 label.isHidden = detail.voteAverage == 0 || detail.voteCount == 0
             }
             if let imdbButton = imdbDetailsButton {
-                imdbButton.isHidden = detail.imdbID == nil
+                if let imdb = detail.imdbID, imdb.count > 0 {
+                    imdbButton.isHidden = false
+                } else {
+                    imdbButton.isHidden = true
+                }
             }
             
             if let textView = overviewTextView {
@@ -73,15 +77,24 @@ class MovieDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.isToolbarHidden = true
-        
+        navigationController?.setToolbarHidden(true, animated: true)
         configureView()
     }
-
+    
     var detailItem: Movie? {
         didSet {
             configureView()
+            if let detail = detailItem {
+                dbCoordinator?.loadDetailsForMovie(movie: detail) { dict in
+                    detail.updateWithJson(payload: dict)
+                    self.configureView()
+                }
+            }
         }
+    }
+    
+    @objc func reloadContents() {
+        configureView()
     }
     
     @IBAction func openImdb(sender: UIButton) {

@@ -26,8 +26,8 @@ public class Movie: NSManagedObject {
             self.budget = budget as! Int64
         }
         
-        if let homepage = payload["homepage"] as! String? {
-            self.homepage = homepage
+        if let homepage = payload["homepage"] {
+            self.homepage = homepage as? String
         }
         
         if let remoteId = payload["id"] {
